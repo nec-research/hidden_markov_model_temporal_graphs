@@ -2,12 +2,12 @@
 
 The repository contains the scripts to reproduce the results of the paper
 
-Errica F., Gravina A., Bacciu D., Micheli A., _Robust Malware Classification via Deep Graph Networks on Call Graph Topologies_, ESANN 2023.
+Errica F., Gravina A., Bacciu D., Micheli A., _Hidden Markov Models for Temporal Graph Representation Learning_, ESANN 2023.
 
 If you found the code and paper useful, please consider citing us:
 ```bibtex
 @inproceedings{errica_hidden_2023,
-title={Robust Malware Classification via Deep Graph Networks on Call Graph Topologies},
+title={Hidden Markov Models for Temporal Graph Representation Learning},
 author={Errica, Federico and Gravina, Alessio and Bacciu, Davide and Micheli, Alessio},
 booktitle={Proceedings of the 31st European Symposium on Artificial Neural Networks, Computational Intelligence and Machine Learning (ESANN)},
 year={2023},
