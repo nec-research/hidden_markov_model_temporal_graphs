@@ -1,0 +1,19 @@
+splitter:
+  root: DATA_SPLITS/
+  class_name: pydgn.data.splitter.SingleGraphSequenceSplitter
+  args:
+    n_outer_folds: 1  # must be 1 in this case
+    n_inner_folds: 1  # see documentation of SingleGraphSequenceSplitter
+    seed: 0
+    stratify: False
+    shuffle: False
+    inner_val_ratio: 0.1
+    outer_val_ratio: 0.1
+    test_ratio: 0.1
+dataset:
+  root: DATA/
+  class_name: datasets.ChickenpoxDatasetInterface
+  args:
+    root: DATA/
+    name: chickenpox
+    lags: 1

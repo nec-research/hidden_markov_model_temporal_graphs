@@ -1,0 +1,98 @@
+# Dataset and Splits
+data_root: DATA/
+dataset_class: datasets.TwitterTennisDatasetInterface
+dataset_name:  twitter
+data_splits_file:  DATA_SPLITS/twitter/twitter_outer1_inner1.splits
+
+
+# Hardware
+device: cpu # cpu | cuda
+max_cpus: 8 # > 1 for parallelism
+max_gpus: 0 # > 0 for gpu usage (device must be cuda though)
+gpus_per_task: 1 # percentage of gpus to allocate for each task
+
+
+# Data Loading
+dataset_getter: provider.IncrementalSingleGraphSequenceDataProvider
+data_loader:
+  class_name:  torch.utils.data.DataLoader
+  args:
+    num_workers: 0
+    pin_memory: False
+
+
+# Reproducibility
+seed: 42
+
+
+# Experiment
+result_folder: HMM4G_RESULTS/
+exp_name:  hmm4g_embeddings
+experiment:  hmm4g_embedding_task.EmbeddingHMM4GTask
+higher_results_are_better:  True
+evaluate_every: 1
+final_training_runs: 1
+
+
+# Grid Search
+grid:
+  # Temporal info
+  reset_eval_model_hidden_state: False  # do not reset hidden state of model between training/validation/test inference. Can be useful works for single graph sequence.
+  # If set to true, consider training/validation/test sequence as independent.
+
+  layer_config:
+    model: hmm4g.HMM4G
+    checkpoint: True
+    batch_size: 16
+    shuffle: False
+
+    embeddings_folder: HMM4G_EMBEDDINGS/
+
+    # Model specific arguments #
+
+    max_layers: 3
+
+    # NOTE: we do not need to specify a specific number of layers here. We do a single unsupervised training of
+    # max_layers, and then we cut to the depth that we need in the classification phase.
+
+    C:
+      - 10
+      - 20
+
+    epochs: 
+      - 10
+      - 20
+
+    readout: readout.UnsupervisedProbabilisticNodeReadout
+    emission: emission.IsotropicGaussian
+
+    unibigram: True  # the experiment above will generate embeddings with both unigrams and unibigram representation
+
+    # ------------------------ #
+
+    # Training engine
+    engine:
+      - class_name: engine.HMM4GGraphSequenceTrainingEngine
+        args:
+          engine_callback: pydgn.training.callback.engine_callback.TemporalEngineCallback
+
+    # Loss
+    loss: metric.HMM4GLoss
+
+    # Optimizer
+    optimizer:
+      - class_name: optimizer.HMM4GOptimizer
+        args:
+          optimizer_class_name: torch.optim.Adam  # not used! but necessary for the library
+          accumulate_gradients: True  # for full batch training while using mini-batches
+
+    # Scores
+    scorer:
+      - class_name: pydgn.training.callback.metric.MultiScore
+        args:
+          # used at model selection time. Should be the one on which to perform early stopping
+          main_scorer: metric.HMM4GLoss
+          log_likelihood: metric.HMM4GLogLikelihood
+
+    # Plotter
+    plotter: pydgn.training.callback.plotter.Plotter
